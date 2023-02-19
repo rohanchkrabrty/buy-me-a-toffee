@@ -72,6 +72,15 @@ const Profile = () => {
             })
             .then(txn => txn.wait());
     });
+    const withdraw = useMutation(async () => {
+        console.log("withdraw >> ");
+        const contract = new ethers.Contract(
+            contractAddress,
+            contractABI,
+            signer
+        );
+        return await contract.withdraw(address).then(txn => txn.wait());
+    });
 
     return (
         <VStack
@@ -146,7 +155,20 @@ const Profile = () => {
                             bgColor="#ffdd00"
                             _hover={{ bgColor: "#ffdd00", opacity: 0.7 }}
                             rounded="full"
-                            isLoading={contractRead.isLoading}>
+                            onClick={() =>
+                                withdraw.mutate(null, {
+                                    onSuccess: () => {
+                                        toast({
+                                            title: "Withdrawal success",
+                                            status: "success",
+                                            duration: 4000,
+                                        });
+                                    },
+                                })
+                            }
+                            isLoading={
+                                contractRead.isLoading || withdraw.isLoading
+                            }>
                             Withdraw
                         </Button>
                     </VStack>
